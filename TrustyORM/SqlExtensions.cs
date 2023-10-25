@@ -6,7 +6,7 @@ using TrustyORM.ModelInteractions;
 namespace TrustyORM;
 public static class SqlExtensions
 {
-    public static IEnumerable<T> Query<T>(this DbConnection connection, string query) where T : new()
+    public static IEnumerable<T> Query<T>(this DbConnection connection, string query)
     {
         if (connection == null)
         {
@@ -21,13 +21,13 @@ public static class SqlExtensions
         DbCommand command = connection.CreateCommand();
         command.CommandText = query;
 
-        DbDataReader reader = command.ExecuteReader();
+        DbDataReader reader = command.ExecuteReader(CommandBehavior.KeyInfo);
 
         if (!reader.HasRows)
         {
             return Enumerable.Empty<T>();
         }
 
-        return new ModelConverter<T>(reader);
+        return new ModelEnumerable<T>(reader);
     }
 }

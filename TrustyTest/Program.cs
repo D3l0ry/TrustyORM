@@ -7,7 +7,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        SqlConnection connection = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TrystyORM;Integrated Security=True;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+        using SqlConnection connection = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TrustyORM;Integrated Security=True;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
         connection.Open();
 
         try
@@ -26,12 +26,22 @@ internal class Program
             //    command.ExecuteNonQuery();
             //}
 
-            var users = connection.Query<int>("SELECT Id, Email FROM [User]");
+            //var users = connection.Query<string>("SELECT Email FROM [User]");
 
-            foreach (var currentUser in users)
-            {
-                Console.WriteLine($"Номер:{currentUser};");
-            }
+            //foreach (var currentUser in users)
+            //{
+            //    Console.WriteLine($"Номер:{currentUser};");
+            //}
+
+            SqlCommand command = connection.CreateCommand();
+            command.CommandText = "SELECT * FROM [User] JOIN Profile pr ON pr.Id = [User].ProfileId";
+
+            SqlDataReader reader = command.ExecuteReader(System.Data.CommandBehavior.KeyInfo);
+            var schema = reader.GetColumnSchema();
+            //while (reader.Read())
+            //{
+            //    //var schema = reader.GetColumnSchema()[0];
+            //}
         }
         finally
         {

@@ -3,10 +3,10 @@ using System.Reflection;
 
 namespace TrustyORM.ModelInteractions;
 
-internal class TableProperties<T> : IEnumerable<KeyValuePair<PropertyInfo, ColumnAttribute>>
+internal class TableProperties<T> : IEnumerable<KeyValuePair<PropertyInfo, ColumnAttribute?>>
 {
     private readonly Type _tableType;
-    private readonly KeyValuePair<PropertyInfo, ColumnAttribute>[] _properties;
+    private readonly KeyValuePair<PropertyInfo, ColumnAttribute?>[] _properties;
 
     public TableProperties()
     {
@@ -14,12 +14,11 @@ internal class TableProperties<T> : IEnumerable<KeyValuePair<PropertyInfo, Colum
         _properties = GetProperties().ToArray();
     }
 
-    public KeyValuePair<PropertyInfo, ColumnAttribute>[] Properties => _properties;
+    public KeyValuePair<PropertyInfo, ColumnAttribute?>[] Properties => _properties;
 
-    private IEnumerable<KeyValuePair<PropertyInfo, ColumnAttribute>> GetProperties()
+    private IEnumerable<KeyValuePair<PropertyInfo, ColumnAttribute?>> GetProperties()
     {
-        IEnumerable<PropertyInfo> properties = _tableType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(currentProperty => currentProperty.IsDefined(typeof(ColumnAttribute)));
+        IEnumerable<PropertyInfo> properties = _tableType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
         foreach (PropertyInfo currentProperty in properties)
         {
@@ -32,9 +31,9 @@ internal class TableProperties<T> : IEnumerable<KeyValuePair<PropertyInfo, Colum
         }
     }
 
-    public KeyValuePair<PropertyInfo, ColumnAttribute> GetProperty(int propertyIndex) => _properties[propertyIndex];
+    public KeyValuePair<PropertyInfo, ColumnAttribute?> GetProperty(int propertyIndex) => _properties[propertyIndex];
 
-    public KeyValuePair<PropertyInfo, ColumnAttribute> GetProperty(string propertyColumnName)
+    public KeyValuePair<PropertyInfo, ColumnAttribute?> GetProperty(string propertyColumnName)
     {
         if (string.IsNullOrWhiteSpace(propertyColumnName))
         {
@@ -52,7 +51,7 @@ internal class TableProperties<T> : IEnumerable<KeyValuePair<PropertyInfo, Colum
         return selectedProperty;
     }
 
-    public KeyValuePair<PropertyInfo, ColumnAttribute> GetProperty(PropertyInfo property)
+    public KeyValuePair<PropertyInfo, ColumnAttribute?> GetProperty(PropertyInfo property)
     {
         KeyValuePair<PropertyInfo, ColumnAttribute> selectedProperty = _properties
             .FirstOrDefault(currentProperty => currentProperty.Key == property);
@@ -65,7 +64,7 @@ internal class TableProperties<T> : IEnumerable<KeyValuePair<PropertyInfo, Colum
         return selectedProperty;
     }
 
-    public IEnumerator<KeyValuePair<PropertyInfo, ColumnAttribute>> GetEnumerator() => _properties.AsEnumerable().GetEnumerator();
+    public IEnumerator<KeyValuePair<PropertyInfo, ColumnAttribute?>> GetEnumerator() => _properties.AsEnumerable().GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => _properties.GetEnumerator();
 }

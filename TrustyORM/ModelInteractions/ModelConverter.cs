@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using TrustyORM.Extensions;
 
 namespace TrustyORM.ModelInteractions;
 
-internal class ModelConverter<T> : IEnumerable<T>
+internal class ModelConverter<T>
 {
     private readonly DbDataReader _dataReader;
     private readonly bool _isSystemType;
@@ -15,7 +14,6 @@ internal class ModelConverter<T> : IEnumerable<T>
     internal ModelConverter(DbDataReader dataReader)
     {
         _dataReader = dataReader ?? throw new ArgumentNullException(nameof(dataReader));
-
         _isSystemType = typeof(T).IsSystemType();
         _tableProperties = new TableProperties<T>();
     }
@@ -23,22 +21,6 @@ internal class ModelConverter<T> : IEnumerable<T>
     public Type ElementType => typeof(T);
 
     public bool IsSystemType => _isSystemType;
-
-    private IEnumerator<T> GetInternalEnumerator()
-    {
-        using DbDataReader reader = _dataReader;
-        bool isOnlyField = _dataReader.FieldCount == 1;
-
-        if (_isSystemType && !isOnlyField)
-        {
-            throw new InvalidCastException($"Не удалось преобразовать значения из запроса в тип модели {ElementType}");
-        }
-
-        while (reader.Read())
-        {
-            yield return GetObject(reader);
-        }
-    }
 
     /// <summary>
     /// Получение объекта из таблицы
@@ -62,8 +44,4 @@ internal class ModelConverter<T> : IEnumerable<T>
 
         return newObject;
     }
-
-    public IEnumerator<T> GetEnumerator() => GetInternalEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetInternalEnumerator();
 }
