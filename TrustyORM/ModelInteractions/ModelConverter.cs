@@ -1,7 +1,7 @@
 ﻿using System.Data.Common;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using TrustyORM.Extensions;
+using TrustyORM.ModelInteractions.ConvertStrategies;
 
 namespace TrustyORM.ModelInteractions;
 
@@ -9,13 +9,18 @@ internal class ModelConverter<T>
 {
     private readonly DbDataReader _dataReader;
     private readonly bool _isSystemType;
-    private readonly TableProperties<T> _tableProperties;
+    private readonly IConvertStrategy<T> _strategy;
 
     internal ModelConverter(DbDataReader dataReader)
     {
+        if (dataReader == null)
+        {
+            throw new ArgumentNullException(nameof(dataReader));
+        }
+
         _dataReader = dataReader ?? throw new ArgumentNullException(nameof(dataReader));
         _isSystemType = typeof(T).IsSystemType();
-        _tableProperties = new TableProperties<T>();
+        _strategy = ChoiceConvertStrategy<T>.GetStrategy(dataReader);
     }
 
     public Type ElementType => typeof(T);
@@ -28,20 +33,25 @@ internal class ModelConverter<T>
     /// <param name="dataReader"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T GetObject(DbDataReader dataReader)
+    public T GetObject() => _strategy.Convert();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public IEnumerable<T> GetObjects()
     {
-        if (_isSystemType)
+        if (!_dataReader.HasRows)
         {
-            return dataReader.GetFieldValue<T>(0);
+            Enumerable.Empty<T>();
         }
 
-        T newObject = Activator.CreateInstance<T>();
+        var list = new List<T>();
 
-        foreach (KeyValuePair<PropertyInfo, ColumnAttribute> currentProperty in _tableProperties)
+        while (_dataReader.Read())
         {
-            currentProperty.SetDataReaderValue(newObject, dataReader);
+            var item = GetObject();
+
+            list.Add(item);
         }
 
-        return newObject;
+        return list;
     }
 }
