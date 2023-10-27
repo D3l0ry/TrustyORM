@@ -5,13 +5,15 @@ using TrustyORM.ModelInteractions.ConvertStrategies;
 namespace TrustyORM.ModelInteractions;
 internal static class ChoiceConvertStrategy<T>
 {
-    public static IConvertStrategy<T> GetStrategy(DbDataReader dataReader)
+    public static IConvertStrategy GetStrategy(DbDataReader dataReader)
     {
-        if (typeof(T).IsSystemType())
+        Type type = typeof(T);
+
+        if (type.IsSystemType())
         {
-            return new SystemTypeConvertStrategy<T>(dataReader);
+            return new SystemTypeConvertStrategy(dataReader);
         }
 
-        return new ModelConvertStrategy<T>(dataReader);
+        return new ModelConvertStrategy(type, dataReader);
     }
 }

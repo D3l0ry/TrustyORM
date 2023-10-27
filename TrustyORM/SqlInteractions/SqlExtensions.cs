@@ -23,4 +23,16 @@ internal static class SqlExtensions
 
         return command.ExecuteReader(CommandBehavior.KeyInfo);
     }
+
+    public static void ExecuteNonQuery(this DbConnection connection, string query)
+    {
+        if (connection == null)
+        {
+            throw new ArgumentNullException(nameof(connection));
+        }
+
+        var command = connection.CreateCommand(query);
+
+        command.ExecuteNonQuery();
+    }
 }

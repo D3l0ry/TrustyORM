@@ -6,11 +6,25 @@ using TrustyORM.SqlInteractions;
 namespace TrustyORM;
 public static class SqlMapper
 {
+    /// <summary>
+    /// Выполняет запрос к базе данных, используя "ленивое" преобразование
+    /// </summary>
+    /// <remarks>Запрос выполняется сразу при вызове метода, 
+    /// но дальнейшее сопоставление типа будет проивзедено при дальнейшей итерации (Ленивое преобразование) для получения объектов.</remarks>
+    /// <typeparam name="T">Тип элемента для преобразования значений из базы данных</typeparam>
+    /// <param name="connection">Соединение к базе данных</param>
+    /// <param name="query">Запрос</param>
+    /// <exception cref="ArgumentNullException"></exception>
     public static IEnumerable<T> Query<T>(this DbConnection connection, string query)
     {
         if (connection == null)
         {
             throw new ArgumentNullException(nameof(connection));
+        }
+
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            throw new ArgumentNullException(nameof(query));
         }
 
         try
@@ -21,16 +35,8 @@ public static class SqlMapper
             }
 
             var reader = connection.ExecuteReader(query);
-            var converter = new ModelConverter<T>(reader);
-            var isOnlyField = reader.VisibleFieldCount == 1;
-
-            if (converter.IsSystemType && !isOnlyField)
-            {
-                throw new InvalidCastException($"Не удалось преобразовать значения из запроса в тип модели {converter.ElementType}");
-            }
 
             return new ModelEnumerable<T>(reader);
-            return converter.GetObjects();
         }
         catch
         {

@@ -57,7 +57,58 @@ internal static class TypeExtensions
 
         foreach (var currentProperty in type.GetModelProperties())
         {
-            bool propertyExistsInSchema = schema.Any(currentColumn => currentColumn.ColumnName == currentProperty.Value.Name);
+            if (currentProperty.Value.IsForeignTable)
+            {
+                yield return currentProperty;
+                continue;
+            }
+
+            bool tableNameIsNull = string.IsNullOrWhiteSpace(currentProperty.Value.Name);
+            bool propertyExistsInSchema = schema
+                .Any(currentColumn =>
+                {
+                    bool columnIsFound = currentColumn.ColumnName == currentProperty.Value.Name;
+
+                    if (tableNameIsNull)
+                    {
+                        return columnIsFound;
+                    }
+
+                    return currentColumn.BaseTableName == currentProperty.Value.Name && columnIsFound;
+                });
+
+            if (propertyExistsInSchema)
+            {
+                yield return currentProperty;
+            }
+        }
+    }
+
+    public static IEnumerable<KeyValuePair<PropertyInfo, ColumnAttribute>> GetModelPropertiesFromSchema(this Type type, IEnumerable<DbColumn> schema, string tableName)
+    {
+        if (schema == null)
+        {
+            throw new ArgumentNullException(nameof(schema));
+        }
+
+        if (string.IsNullOrWhiteSpace(tableName))
+        {
+            throw new ArgumentNullException(nameof(tableName));
+        }
+
+        if (!schema.Any())
+        {
+            yield break;
+        }
+
+        var selectedTableColumnsSchema = schema
+            .Where(currentColumn => currentColumn.BaseTableName == tableName)
+            .ToArray();
+
+        foreach (var currentProperty in type.GetModelProperties())
+        {
+            bool propertyExistsInSchema = selectedTableColumnsSchema
+                .Any(currentColumn => currentColumn.ColumnName == currentProperty.Value.Name);
 
             if (propertyExistsInSchema)
             {

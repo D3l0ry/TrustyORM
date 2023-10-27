@@ -22,31 +22,24 @@ internal class Program
         //    command.ExecuteNonQuery();
         //}
         //var users0 = Dapper.SqlMapper.Query<User>(connection, "SELECT * FROM [User]");
-        var users = connection.Query<User>("SELECT * FROM [User]").Take(50).ToArray();
-        var test = connection.Query<User>("SELECT * FROM [User]");
+        //var users2 = connection.Query<User>("SELECT * FROM [User]").Where(x => x.Id == 999002).ToArray();
+        //var test = connection.Query<User>("SELECT * FROM [User]");
+
+        var users = connection.Query<User>("SELECT TOP(50) * FROM [User] JOIN Profile ON [User].ProfileId = [Profile].Id").ToArray();
         foreach (var currentUser in users)
         {
-            Console.WriteLine($"Номер:{currentUser.Id}; Email:{currentUser.Email}; Login:{currentUser.Login}; Password:{currentUser.Password}");
+            Console.WriteLine($"Номер:{currentUser.Id}; Login:{currentUser.Login}; ProfileFirstName:{currentUser.Profile.FirstName}");
         }
 
-        foreach (var currentUser in test)
-        {
-            Console.WriteLine($"Номер:{currentUser.Id}; Email:{currentUser.Email}; Login:{currentUser.Login}; Password:{currentUser.Password}");
-        }
-        Console.WriteLine("--------------------------------------");
-        var users1 = connection.Query<User>("SELECT * FROM [User]").Skip(15).Take(10);
-        foreach (var currentUser in users1)
-        {
-            Console.WriteLine($"Номер:{currentUser.Id}; Email:{currentUser.Email}; Login:{currentUser.Login}; Password:{currentUser.Password}");
-        }
-        //SqlCommand command = connection.CreateCommand();
-        //command.CommandText = "SELECT * FROM [User] JOIN Profile pr ON pr.Id = [User].ProfileId";
-
-        //SqlDataReader reader = command.ExecuteReader(System.Data.CommandBehavior.KeyInfo);
-        //var schema = reader.GetColumnSchema();
-        //while (reader.Read())
+        //foreach (var currentUser in test)
         //{
-        //    //var schema = reader.GetColumnSchema()[0];
+        //    Console.WriteLine($"Номер:{currentUser.Id}; Email:{currentUser.Email}; Login:{currentUser.Login}; Password:{currentUser.Password}");
+        //}
+        //Console.WriteLine("--------------------------------------");
+        //var users1 = connection.Query<User>("SELECT * FROM [User]").Skip(15).Take(10);
+        //foreach (var currentUser in users1)
+        //{
+        //    Console.WriteLine($"Номер:{currentUser.Id}; Email:{currentUser.Email}; Login:{currentUser.Login}; Password:{currentUser.Password}");
         //}
     }
 
@@ -66,11 +59,23 @@ internal class Program
 
         [Column("Password")]
         public string Password { get; set; }
+
+        [Column("Profile", IsForeignTable = true)]
+        public Profile Profile { get; set; }
     }
 
-    private class TestUser
+    private class Profile
     {
         [Column("Id")]
         public int Id { get; set; }
+
+        [Column("FirstName")]
+        public string FirstName { get; set; }
+
+        [Column("MiddleName")]
+        public string MiddleName { get; set; }
+
+        [Column("LastName")]
+        public string LastName { get; set; }
     }
 }

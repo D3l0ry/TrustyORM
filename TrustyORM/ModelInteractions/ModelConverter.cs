@@ -9,7 +9,7 @@ internal class ModelConverter<T>
 {
     private readonly DbDataReader _dataReader;
     private readonly bool _isSystemType;
-    private readonly IConvertStrategy<T> _strategy;
+    private readonly IConvertStrategy _strategy;
 
     internal ModelConverter(DbDataReader dataReader)
     {
@@ -33,7 +33,7 @@ internal class ModelConverter<T>
     /// <param name="dataReader"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T GetObject() => _strategy.Convert();
+    public T GetObject() => (T)_strategy.Convert();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IEnumerable<T> GetObjects()

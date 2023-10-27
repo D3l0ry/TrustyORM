@@ -1,7 +1,7 @@
 ﻿using System.Data.Common;
 
 namespace TrustyORM.ModelInteractions.ConvertStrategies;
-internal class SystemTypeConvertStrategy<T> : IConvertStrategy<T>
+internal class SystemTypeConvertStrategy : IConvertStrategy
 {
     private readonly DbDataReader _dataReader;
 
@@ -10,5 +10,5 @@ internal class SystemTypeConvertStrategy<T> : IConvertStrategy<T>
         _dataReader = dataReader ?? throw new ArgumentNullException(nameof(dataReader));
     }
 
-    public T Convert() => _dataReader.GetFieldValue<T>(0);
+    public object Convert() => _dataReader.GetValue(0);
 }

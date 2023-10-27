@@ -3,17 +3,25 @@
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class ColumnAttribute : Attribute
 {
-    private readonly string _columnName;
+    private readonly string _name;
 
-    public ColumnAttribute(string columnName)
+    public ColumnAttribute(string name)
     {
-        if (string.IsNullOrWhiteSpace(columnName))
+        if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentNullException(nameof(columnName));
+            throw new ArgumentNullException(nameof(name));
         }
 
-        _columnName = columnName;
+        _name = name;
     }
 
-    public string Name => _columnName;
+    /// <summary>
+    /// Наименование колонки в запросе или наименование таблицы при IsForeignTable = true
+    /// </summary>
+    public string Name => _name;
+
+    /// <summary>
+    /// Является ли свойство внешней таблицей
+    /// </summary>
+    public bool IsForeignTable { get; set; }
 }

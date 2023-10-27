@@ -8,25 +8,31 @@ internal class ModelEnumerable<T> : IEnumerable<T>
 
     public ModelEnumerable(DbDataReader dataReader)
     {
-        _dataReader = dataReader ?? throw new ArgumentNullException(nameof(dataReader));
+        if (dataReader == null)
+        {
+            throw new ArgumentNullException(nameof(dataReader));
+        }
+
+        _dataReader = dataReader;
     }
 
     private IEnumerator<T> GetInternalEnumerator()
     {
+        using var reader = _dataReader;
         var converter = new ModelConverter<T>(_dataReader);
-        var isOnlyField = _dataReader.VisibleFieldCount == 1;
+        var isOnlyField = reader.VisibleFieldCount == 1;
 
         if (converter.IsSystemType && !isOnlyField)
         {
             throw new InvalidCastException($"Не удалось преобразовать значения из запроса в тип модели {converter.ElementType}");
         }
 
-        if (!_dataReader.HasRows)
+        if (!reader.HasRows)
         {
             yield break;
         }
 
-        while (_dataReader.Read())
+        while (reader.Read())
         {
             yield return converter.GetObject();
         }
