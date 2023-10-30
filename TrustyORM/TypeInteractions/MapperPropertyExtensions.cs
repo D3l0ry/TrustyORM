@@ -1,8 +1,9 @@
 ﻿using System.Data.Common;
 using System.Reflection;
+using TrustyORM.TypeInteractions;
 
 namespace TrustyORM.Extensions;
-internal static class PropertyExtensions
+internal static class MapperPropertyExtensions
 {
     /// <summary>
     /// Выдает исключение, если приссваимое значение равно Null, но свойство не принимает значения типа Null
@@ -40,9 +41,20 @@ internal static class PropertyExtensions
         property.SetValue(obj, value);
     }
 
+    private static void SetValue(this PropertyInfo property, object obj, int columnOrdinal, DbDataReader dataReader)
+    {
+        object readerValue = dataReader[columnOrdinal];
+        object? value = property.GetValueOrThrowExceptionIfPropertyIsNotNullableType(readerValue);
+
+        property.SetValue(obj, value);
+    }
+
     public static void SetDataReaderValue(this PropertyInfo property, object obj, DbDataReader dataReader) =>
         property.SetValue(obj, property.Name, dataReader);
 
     public static void SetDataReaderValue(this KeyValuePair<PropertyInfo, ColumnAttribute> property, object obj, DbDataReader dataReader) =>
         property.Key.SetValue(obj, property.Value.Name, dataReader);
+
+    public static void SetDataReaderValue(this MapperTypeInformation property, object obj, DbDataReader dataReader) =>
+        property.Property.SetValue(obj, property.ColumnIndex, dataReader);
 }

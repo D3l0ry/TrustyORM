@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrustyTest", "TrustyTest\Tr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrustyUnitTests", "TrustyUnitTests\TrustyUnitTests.csproj", "{ABCB50AB-58C0-408E-84F9-212B75B63DE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrustyBencmarks", "TrustyBencmarks\TrustyBencmarks.csproj", "{F5CA61DD-F864-4F1B-87F0-66CD901CB975}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrustyBencmarks", "TrustyBencmarks\TrustyBencmarks.csproj", "{F5CA61DD-F864-4F1B-87F0-66CD901CB975}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,8 +29,8 @@ Global
 		{ABCB50AB-58C0-408E-84F9-212B75B63DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABCB50AB-58C0-408E-84F9-212B75B63DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABCB50AB-58C0-408E-84F9-212B75B63DE4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F5CA61DD-F864-4F1B-87F0-66CD901CB975}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{F5CA61DD-F864-4F1B-87F0-66CD901CB975}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{F5CA61DD-F864-4F1B-87F0-66CD901CB975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5CA61DD-F864-4F1B-87F0-66CD901CB975}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5CA61DD-F864-4F1B-87F0-66CD901CB975}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5CA61DD-F864-4F1B-87F0-66CD901CB975}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

@@ -16,12 +16,7 @@ public class ColumnAttribute : Attribute
     }
 
     /// <summary>
-    /// Наименование колонки в запросе или наименование таблицы при IsForeignTable = true
+    /// Наименование колонки
     /// </summary>
     public string Name => _name;
-
-    /// <summary>
-    /// Является ли свойство внешней таблицей
-    /// </summary>
-    public bool IsForeignTable { get; set; }
 }

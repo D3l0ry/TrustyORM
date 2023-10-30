@@ -1,13 +1,15 @@
 ﻿using System.Data.Common;
 using System.Reflection;
 using TrustyORM.Extensions;
+using TrustyORM.TypeInteractions;
 
 namespace TrustyORM.ModelInteractions.ConvertStrategies;
 internal class ModelConvertStrategy : IConvertStrategy
 {
     private readonly Type _type;
     private readonly DbDataReader _dataReader;
-    private readonly KeyValuePair<PropertyInfo, ColumnAttribute>[] _properties;
+    private readonly KeyValuePair<MapperTypeInformation, ColumnAttribute>[] _properties;
+    private readonly KeyValuePair<PropertyInfo, ForeignTableAttribute>[] _foreignTablesProperties;
 
     public ModelConvertStrategy(Type type, DbDataReader dataReader)
     {
@@ -25,9 +27,10 @@ internal class ModelConvertStrategy : IConvertStrategy
         _dataReader = dataReader;
         var schema = dataReader.GetColumnSchema();
         _properties = type.GetModelPropertiesFromSchema(schema).ToArray();
+        _foreignTablesProperties = type.GetModelForeignTableProperties().ToArray();
     }
 
-    public ModelConvertStrategy(KeyValuePair<PropertyInfo, ColumnAttribute> property, DbDataReader dataReader)
+    public ModelConvertStrategy(KeyValuePair<PropertyInfo, ForeignTableAttribute> property, DbDataReader dataReader)
     {
         if (dataReader == null)
         {
@@ -37,25 +40,27 @@ internal class ModelConvertStrategy : IConvertStrategy
         _type = property.Key.PropertyType;
         _dataReader = dataReader;
         var schema = dataReader.GetColumnSchema();
-        _properties = _type.GetModelPropertiesFromSchema(schema, property.Value.Name).ToArray();
+        _properties = _type.GetModelPropertiesFromSchema(schema, property.Value.TableName).ToArray();
     }
 
-    public object Convert()
+    public object? Convert()
     {
-        object newObject = Activator.CreateInstance(_type);
+        object? newObject = Activator.CreateInstance(_type);
 
-        foreach (KeyValuePair<PropertyInfo, ColumnAttribute> currentProperty in _properties)
+        foreach (var currentProperty in _properties)
         {
-            if (currentProperty.Value.IsForeignTable)
+            currentProperty.Key.SetDataReaderValue(newObject, _dataReader);
+        }
+
+        if (_foreignTablesProperties != null)
+        {
+            foreach (var currentForeignTable in _foreignTablesProperties)
             {
-                var foreignTableConvertStrategy = new ModelConvertStrategy(currentProperty, _dataReader);
+                var foreignTableConvertStrategy = new ModelConvertStrategy(currentForeignTable, _dataReader);
                 var result = foreignTableConvertStrategy.Convert();
 
-                currentProperty.Key.SetValue(newObject, result);
-                continue;
+                currentForeignTable.Key.SetValue(newObject, result);
             }
-
-            currentProperty.SetDataReaderValue(newObject, _dataReader);
         }
 
         return newObject;

@@ -7,7 +7,7 @@ namespace TrustyORM;
 public static class SqlMapper
 {
     /// <summary>
-    /// Выполняет запрос к базе данных, используя "ленивое" преобразование
+    /// Выполняет запрос к базе данных, используя "ленивое" преобразование без буфера
     /// </summary>
     /// <remarks>Запрос выполняется сразу при вызове метода, 
     /// но дальнейшее сопоставление типа будет проивзедено при дальнейшей итерации (Ленивое преобразование) для получения объектов.</remarks>
@@ -35,6 +35,7 @@ public static class SqlMapper
             }
 
             var reader = connection.ExecuteReader(query);
+            var modelEnumerable = new ModelEnumerable<T>(reader);
 
             return new ModelEnumerable<T>(reader);
         }
@@ -44,7 +45,7 @@ public static class SqlMapper
         }
     }
 
-    public static void Execute(this DbConnection connection, string query)
+    public static int Execute(this DbConnection connection, string query)
     {
         if (connection == null)
         {
@@ -56,9 +57,8 @@ public static class SqlMapper
             connection.Open();
         }
 
-        DbCommand command = connection.CreateCommand();
-        command.CommandText = query;
+        var command = connection.CreateCommand(query);
 
-        command.ExecuteNonQuery();
+        return command.ExecuteNonQuery();
     }
 }
