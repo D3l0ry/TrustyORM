@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Data.Common;
+using TrustyORM.ModelInteractions.Converters;
 
 namespace TrustyORM.ModelInteractions;
 internal class ModelEnumerable<T> : IEnumerable<T>
@@ -8,10 +9,7 @@ internal class ModelEnumerable<T> : IEnumerable<T>
 
     public ModelEnumerable(DbDataReader dataReader)
     {
-        if (dataReader == null)
-        {
-            throw new ArgumentNullException(nameof(dataReader));
-        }
+        ArgumentNullException.ThrowIfNull(dataReader);
 
         _dataReader = dataReader;
     }

@@ -20,8 +20,8 @@ public class UserModel
     [Column("Email")]
     public string Email { get; set; }
 
-    [ForeignTable("Profile")]
-    public ProfileModel Profile { get; set; }
+    //[ForeignTable("Profile")]
+    //public ProfileModel Profile { get; set; }
 }
 
 public class ProfileModel

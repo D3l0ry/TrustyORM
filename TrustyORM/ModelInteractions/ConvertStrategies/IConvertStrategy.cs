@@ -1,5 +1,5 @@
 ﻿namespace TrustyORM.ModelInteractions.ConvertStrategies;
-internal interface IConvertStrategy
+internal interface IConvertStrategy<T>
 {
-    object? Convert();
+    T? Convert();
 }

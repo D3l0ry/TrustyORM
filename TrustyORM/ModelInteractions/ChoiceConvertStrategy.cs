@@ -3,17 +3,17 @@ using TrustyORM.Extensions;
 using TrustyORM.ModelInteractions.ConvertStrategies;
 
 namespace TrustyORM.ModelInteractions;
-internal static class ChoiceConvertStrategy<T>
+internal static class ChoiceConvertStrategy
 {
-    public static IConvertStrategy GetStrategy(DbDataReader dataReader)
+    public static IConvertStrategy<T> GetStrategy<T>(DbDataReader dataReader)
     {
         Type type = typeof(T);
 
         if (type.IsSystemType())
         {
-            return new SystemTypeConvertStrategy(dataReader);
+            return new SystemTypeConvertStrategy<T>(dataReader);
         }
 
-        return new ModelConvertStrategy(type, dataReader);
+        return new ModelConvertStrategy<T>(dataReader);
     }
 }

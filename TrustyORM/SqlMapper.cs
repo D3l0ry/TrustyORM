@@ -17,15 +17,8 @@ public static class SqlMapper
     /// <exception cref="ArgumentNullException"></exception>
     public static IEnumerable<T> Query<T>(this DbConnection connection, string query)
     {
-        if (connection == null)
-        {
-            throw new ArgumentNullException(nameof(connection));
-        }
-
-        if (string.IsNullOrWhiteSpace(query))
-        {
-            throw new ArgumentNullException(nameof(query));
-        }
+        ArgumentNullException.ThrowIfNull(connection);
+        ArgumentNullException.ThrowIfNull(query);
 
         try
         {
@@ -35,7 +28,6 @@ public static class SqlMapper
             }
 
             var reader = connection.ExecuteReader(query);
-            var modelEnumerable = new ModelEnumerable<T>(reader);
 
             return new ModelEnumerable<T>(reader);
         }
@@ -47,10 +39,8 @@ public static class SqlMapper
 
     public static int Execute(this DbConnection connection, string query)
     {
-        if (connection == null)
-        {
-            throw new ArgumentNullException(nameof(connection));
-        }
+        ArgumentNullException.ThrowIfNull(connection);
+        ArgumentNullException.ThrowIfNull(query);
 
         if (connection.State == ConnectionState.Closed)
         {

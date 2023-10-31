@@ -7,7 +7,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        using SqlConnection connection = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Connection Timeout=600;Command Timeout=600;Initial Catalog=TrustyORM;Integrated Security=True;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+        using SqlConnection connection = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Connection Timeout=600;Command Timeout=600;Initial Catalog=TrustyORM;Integrated Security=True;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;");
         //SqlCommand command = connection.CreateCommand();
 
         //for (int i = 10001; i < 1000000; i++)
@@ -25,10 +25,11 @@ internal class Program
         //var users2 = connection.Query<User>("SELECT * FROM [User]").Where(x => x.Id == 999002).ToArray();
         //var test = connection.Query<User>("SELECT * FROM [User]");
 
-        var users = connection.Query<User>("SELECT * FROM [User]").TakeLast(50);
+        var users = connection.Query<User>("SELECT * FROM [User] LEFT JOIN [Profile] ON [Profile].Id=[User].ProfileId")
+            .Where(x => x.Id == 999999);
         foreach (var currentUser in users)
         {
-            Console.WriteLine($"Номер:{currentUser.Id}; Login:{currentUser.Login};");
+            Console.WriteLine($"Номер:{currentUser.Id}; Login:{currentUser.Login};FirstName:{currentUser.Profile.FirstName}");
         }
 
         //foreach (var currentUser in test)
@@ -41,8 +42,6 @@ internal class Program
         //{
         //    Console.WriteLine($"Номер:{currentUser.Id}; Email:{currentUser.Email}; Login:{currentUser.Login}; Password:{currentUser.Password}");
         //}
-
-        Console.ReadLine();
     }
 
     private class User
@@ -62,8 +61,8 @@ internal class Program
         [Column("Password")]
         public string Password { get; set; }
 
-        //[ForeignTable("Profile")]
-        //public Profile Profile { get; set; }
+        [ForeignTable("Profile")]
+        public Profile Profile { get; set; }
     }
 
     private class Profile

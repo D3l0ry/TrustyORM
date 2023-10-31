@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 using System.Reflection;
-using TrustyORM.TypeInteractions;
+using TrustyORM.ModelInteractions;
 
 namespace TrustyORM.Extensions;
 internal static class MapperPropertyExtensions
@@ -55,6 +55,6 @@ internal static class MapperPropertyExtensions
     public static void SetDataReaderValue(this KeyValuePair<PropertyInfo, ColumnAttribute> property, object obj, DbDataReader dataReader) =>
         property.Key.SetValue(obj, property.Value.Name, dataReader);
 
-    public static void SetDataReaderValue(this MapperTypeInformation property, object obj, DbDataReader dataReader) =>
-        property.Property.SetValue(obj, property.ColumnIndex, dataReader);
+    public static void SetDataReaderValue(this MapperPropertyInformation mapperProperty, object obj, DbDataReader dataReader) =>
+        mapperProperty.Property.SetValue(obj, mapperProperty.Column.ColumnOrdinal.Value, dataReader);
 }

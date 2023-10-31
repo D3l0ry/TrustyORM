@@ -6,10 +6,8 @@ internal static class SqlExtensions
 {
     public static DbCommand CreateCommand(this DbConnection connection, string query)
     {
-        if (connection == null)
-        {
-            throw new ArgumentNullException(nameof(connection));
-        }
+        ArgumentNullException.ThrowIfNull(connection);
+        ArgumentNullException.ThrowIfNull(query);
 
         var command = connection.CreateCommand();
         command.CommandText = query;
@@ -24,15 +22,10 @@ internal static class SqlExtensions
         return command.ExecuteReader(CommandBehavior.KeyInfo);
     }
 
-    public static void ExecuteNonQuery(this DbConnection connection, string query)
+    public static int ExecuteNonQuery(this DbConnection connection, string query)
     {
-        if (connection == null)
-        {
-            throw new ArgumentNullException(nameof(connection));
-        }
-
         var command = connection.CreateCommand(query);
 
-        command.ExecuteNonQuery();
+        return command.ExecuteNonQuery();
     }
 }
