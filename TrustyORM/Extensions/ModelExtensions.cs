@@ -83,7 +83,7 @@ internal static class ModelExtensions
 
             if (foundColumnSchema == null)
             {
-                continue;
+                throw new MissingFieldException($"Столбец с именем {currentProperty.Value.Name} не найден при получении полей внешней таблицы");
             }
 
             yield return new MapperPropertyInformation(currentProperty.Key, foundColumnSchema);

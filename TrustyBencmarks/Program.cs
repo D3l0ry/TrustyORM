@@ -1,10 +1,11 @@
-﻿namespace TrustyBencmarks;
+﻿using BenchmarkDotNet.Running;
+
+namespace TrustyBencmarks;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        BenchmarkDotNet.Running.BenchmarkRunner
-            .Run<BenchamarkMethods>(/*DefaultConfig.Instance.WithOption(ConfigOptions.DisableOptimizationsValidator, true)*/);
+        BenchmarkRunner.Run<BenchamarkMethods>(/*DefaultConfig.Instance.WithOption(ConfigOptions.DisableOptimizationsValidator, true)*/);
     }
 }

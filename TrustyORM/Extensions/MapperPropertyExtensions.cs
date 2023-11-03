@@ -13,6 +13,7 @@ internal static class MapperPropertyExtensions
     /// <exception cref="InvalidCastException"></exception>
     private static object? GetValueOrThrowExceptionIfPropertyIsNotNullableType(this PropertyInfo property, object readerValue)
     {
+        return readerValue;
         Type propertyType = property.PropertyType;
 
         if (readerValue is not DBNull)
@@ -25,7 +26,7 @@ internal static class MapperPropertyExtensions
             return null;
         }
 
-        if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+        if (Nullable.GetUnderlyingType(propertyType) != null)
         {
             return null;
         }

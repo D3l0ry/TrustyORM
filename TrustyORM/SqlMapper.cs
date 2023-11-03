@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
+using TrustyORM.Extensions;
 using TrustyORM.ModelInteractions;
-using TrustyORM.SqlInteractions;
 
 namespace TrustyORM;
 public static class SqlMapper
@@ -28,8 +28,9 @@ public static class SqlMapper
             }
 
             var reader = connection.ExecuteReader(query);
+            var converter = ChoiceConvertStrategy.GetStrategy<T>(reader);
 
-            return new ModelEnumerable<T>(reader);
+            return converter.Convert();
         }
         catch
         {

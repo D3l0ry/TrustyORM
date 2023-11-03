@@ -5,25 +5,20 @@ internal static class TypeExtensions
     {
         ArgumentNullException.ThrowIfNull(type);
 
-        Type[] systemTypes = new[]
-        {
-            typeof(bool),
-            typeof(byte) ,
-            typeof(sbyte) ,
-            typeof(short),
-            typeof(ushort),
-            typeof(int) ,
-            typeof(uint),
-            typeof(long) ,
-            typeof(ulong) ,
-            typeof(float) ,
-            typeof(double) ,
-            typeof(decimal) ,
-            typeof(string) ,
-            typeof(DateTime),
-            typeof(Guid)
-        };
-
-        return systemTypes.Any(currentType => currentType == type);
+        return type == typeof(bool)
+            || type == typeof(byte)
+            || type == typeof(sbyte)
+            || type == typeof(short)
+            || type == typeof(ushort)
+            || type == typeof(int)
+            || type == typeof(uint)
+            || type == typeof(long)
+            || type == typeof(ulong)
+            || type == typeof(float)
+            || type == typeof(double)
+            || type == typeof(decimal)
+            || type == typeof(string)
+            || type == typeof(DateTime)
+            || type == typeof(Guid);
     }
 }

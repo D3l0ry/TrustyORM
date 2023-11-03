@@ -1,16 +1,23 @@
 ﻿using System.Data.Common;
 
 namespace TrustyORM.ModelInteractions.ConvertStrategies;
-internal class SystemTypeConvertStrategy<T> : IConvertStrategy<T>
+internal class SystemTypeConvertStrategy<T> : ConvertStrategyContext<T>
 {
-    private readonly DbDataReader _dataReader;
+    public SystemTypeConvertStrategy(DbDataReader dataReader) : base(dataReader) { }
 
-    public SystemTypeConvertStrategy(DbDataReader dataReader)
+    public override IEnumerable<T> Convert()
     {
-        ArgumentNullException.ThrowIfNull(dataReader);
+        using (Reader)
+        {
+            if (!Reader.HasRows)
+            {
+                yield break;
+            }
 
-        _dataReader = dataReader;
+            while (Reader.Read())
+            {
+                yield return Reader.GetFieldValue<T>(0);
+            }
+        }
     }
-
-    public T? Convert() => _dataReader.GetFieldValue<T>(0);
 }

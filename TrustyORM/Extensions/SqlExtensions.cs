@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
 
-namespace TrustyORM.SqlInteractions;
+namespace TrustyORM;
 internal static class SqlExtensions
 {
     public static DbCommand CreateCommand(this DbConnection connection, string query)

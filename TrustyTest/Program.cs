@@ -25,11 +25,10 @@ internal class Program
         //var users2 = connection.Query<User>("SELECT * FROM [User]").Where(x => x.Id == 999002).ToArray();
         //var test = connection.Query<User>("SELECT * FROM [User]");
 
-        var users = connection.Query<User>("SELECT * FROM [User] LEFT JOIN [Profile] ON [Profile].Id=[User].ProfileId")
-            .Where(x => x.Id == 999999);
+        var users = connection.Query<User>("SELECT * FROM [User]").ToArray();
         foreach (var currentUser in users)
         {
-            Console.WriteLine($"Номер:{currentUser.Id}; Login:{currentUser.Login};FirstName:{currentUser.Profile.FirstName}");
+            Console.WriteLine($"Номер:{currentUser.Id}; Login:{currentUser.Login};FirstName:{currentUser.Profile?.FirstName}");
         }
 
         //foreach (var currentUser in test)

@@ -2,7 +2,7 @@
 using System.Reflection;
 using TrustyORM.Extensions;
 
-namespace TrustyORM.ModelInteractions.Converters;
+namespace TrustyORM.ModelInteractions.ConvertStrategies;
 internal class ForeignTableConverter
 {
     private readonly Type _type;
