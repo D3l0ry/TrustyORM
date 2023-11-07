@@ -5,38 +5,72 @@ using TrustyORM.Extensions;
 namespace TrustyORM.ModelInteractions.ConvertStrategies;
 internal class ModelConvertStrategy<T> : ConvertStrategyContext<T>
 {
-    private readonly KeyValuePair<PropertyInfo, ColumnAttribute>[] _properties;
+    private readonly IEnumerable<DbColumn> _schema;
+    private readonly MapperPropertyInformation[] _properties;
     private readonly KeyValuePair<PropertyInfo, ForeignTableAttribute>[] _foreignTableProperties;
+    private readonly bool _foreignTableIsCollection;
 
     public ModelConvertStrategy(DbDataReader dataReader) : base(dataReader)
     {
         var type = typeof(T);
-        _properties = type.GetModelProperties();
+
+        _schema = dataReader.GetColumnSchema();
+        _properties = type.GetModelPropertiesFromSchema(_schema).ToArray();
         _foreignTableProperties = type.GetForeignTableProperties();
+        _foreignTableIsCollection = _foreignTableProperties
+            .Any(currentProperty => currentProperty.Key.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>));
     }
 
-    public override IEnumerable<T> Convert()
+    protected override T? GetObject()
+    {
+        T newObject = Activator.CreateInstance<T>();
+
+        foreach (var currentProperty in _properties)
+        {
+            currentProperty.SetDataReaderValue(newObject!, Reader);
+        }
+
+        foreach (var currentForeignTable in _foreignTableProperties)
+        {
+            var foreignTableConverter = new ForeignTableConverter(currentForeignTable, _schema);
+            var result = foreignTableConverter.GetObject(Reader);
+
+            currentForeignTable.Key.SetValue(newObject, result);
+        }
+
+        return newObject;
+    }
+
+    private IEnumerator<T> GetObjectsEnumerator()
     {
         using (Reader)
         {
-            if (!Reader.HasRows)
+            var primaryKeyProperty = _properties.FirstOrDefault(currentProperty => currentProperty.Column.IsKey.GetValueOrDefault());
+
+            if (primaryKeyProperty == null)
             {
-                yield break;
+                throw new InvalidCastException($"Нет первичного ключа в модели {typeof(T)} для получения внешних таблиц");
             }
 
-            while (Reader.Read())
+            var records = Reader.Enumerate()
+            .GroupBy(currentReader => currentReader.GetValue(primaryKeyProperty.Column.ColumnOrdinal!.Value))
+            .ToArray();
+
+            foreach (var currentRecord in records)
             {
-                T? newObject = Activator.CreateInstance<T>();
+                var firstReader = currentRecord.First();
+
+                T newObject = Activator.CreateInstance<T>();
 
                 foreach (var currentProperty in _properties)
                 {
-                    currentProperty.SetDataReaderValue(newObject, Reader);
+                    currentProperty.SetDataReaderValue(newObject!, firstReader);
                 }
 
                 foreach (var currentForeignTable in _foreignTableProperties)
                 {
-                    var foreignTableConverter = new ForeignTableConverter(currentForeignTable, Reader);
-                    var result = foreignTableConverter.GetObject();
+                    var foreignTableConverter = new ForeignTableConverter(currentForeignTable, _schema);
+                    var result = foreignTableConverter.GetObjects(currentRecord.AsEnumerable());
 
                     currentForeignTable.Key.SetValue(newObject, result);
                 }
@@ -44,5 +78,15 @@ internal class ModelConvertStrategy<T> : ConvertStrategyContext<T>
                 yield return newObject;
             }
         }
+    }
+
+    public override IEnumerator<T?> GetEnumerator()
+    {
+        if (_foreignTableIsCollection)
+        {
+            return GetObjectsEnumerator();
+        }
+
+        return base.GetEnumerator();
     }
 }

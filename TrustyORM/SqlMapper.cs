@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Data.Common;
-using TrustyORM.Extensions;
 using TrustyORM.ModelInteractions;
 
 namespace TrustyORM;
@@ -15,7 +14,7 @@ public static class SqlMapper
     /// <param name="connection">Соединение к базе данных</param>
     /// <param name="query">Запрос</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public static IEnumerable<T> Query<T>(this DbConnection connection, string query)
+    public static IEnumerable<T?> Query<T>(this DbConnection connection, string query)
     {
         ArgumentNullException.ThrowIfNull(connection);
         ArgumentNullException.ThrowIfNull(query);
@@ -28,9 +27,9 @@ public static class SqlMapper
             }
 
             var reader = connection.ExecuteReader(query);
-            var converter = ChoiceConvertStrategy.GetStrategy<T>(reader);
+            var converter = ChoiceConvertStrategy.GetStrategy<T?>(reader);
 
-            return converter.Convert();
+            return converter;
         }
         catch
         {

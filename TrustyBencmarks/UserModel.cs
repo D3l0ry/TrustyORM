@@ -54,6 +54,27 @@ public class UserModel
     }
 }
 
+public class UserModelForeignTableCollection
+{
+    [Column("Id")]
+    public int Id { get; set; }
+
+    [Column("ProfileId")]
+    public int ProfileId { get; set; }
+
+    [Column("Login")]
+    public string Login { get; set; }
+
+    [Column("Email")]
+    public string Email { get; set; }
+
+    [Column("Password")]
+    public string Password { get; set; }
+
+    [ForeignTable("Profile")]
+    public ICollection<ProfileModel> Profiles { get; set; }
+}
+
 public class ProfileModel
 {
     [Column("Id")]

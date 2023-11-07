@@ -28,4 +28,17 @@ internal static class SqlExtensions
 
         return command.ExecuteNonQuery();
     }
+
+    public static IEnumerable<IDataRecord> Enumerate(this DbDataReader reader)
+    {
+        if (!reader.HasRows)
+        {
+            yield break;
+        }
+
+        foreach (IDataRecord currentReader in reader)
+        {
+            yield return currentReader;
+        }
+    }
 }

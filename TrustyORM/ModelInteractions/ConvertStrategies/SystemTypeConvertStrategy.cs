@@ -5,19 +5,5 @@ internal class SystemTypeConvertStrategy<T> : ConvertStrategyContext<T>
 {
     public SystemTypeConvertStrategy(DbDataReader dataReader) : base(dataReader) { }
 
-    public override IEnumerable<T> Convert()
-    {
-        using (Reader)
-        {
-            if (!Reader.HasRows)
-            {
-                yield break;
-            }
-
-            while (Reader.Read())
-            {
-                yield return Reader.GetFieldValue<T>(0);
-            }
-        }
-    }
+    protected override T? GetObject() => Reader.GetFieldValue<T>(0);
 }

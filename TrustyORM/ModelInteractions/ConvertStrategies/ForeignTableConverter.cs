@@ -1,4 +1,6 @@
-﻿using System.Data.Common;
+﻿using System.Collections;
+using System.Data;
+using System.Data.Common;
 using System.Reflection;
 using TrustyORM.Extensions;
 
@@ -6,22 +8,20 @@ namespace TrustyORM.ModelInteractions.ConvertStrategies;
 internal class ForeignTableConverter
 {
     private readonly Type _type;
-    private readonly DbDataReader _dataReader;
     private readonly MapperPropertyInformation[] _properties;
 
-    public ForeignTableConverter(KeyValuePair<PropertyInfo, ForeignTableAttribute> property, DbDataReader dataReader)
+    public ForeignTableConverter(KeyValuePair<PropertyInfo, ForeignTableAttribute> property, IEnumerable<DbColumn> schema)
     {
         ArgumentNullException.ThrowIfNull(property);
-        ArgumentNullException.ThrowIfNull(dataReader);
+        ArgumentNullException.ThrowIfNull(schema);
 
-        _type = property.Key.PropertyType;
-        _dataReader = dataReader;
-        _properties = property.Key.PropertyType
-            .GetModelPropertiesFromSchema(dataReader.GetColumnSchema(), property.Value.TableName)
+        _type = property.Key.PropertyType.IsGenericType ? property.Key.PropertyType.GetGenericArguments()[0] : property.Key.PropertyType;
+        _properties = _type
+            .GetModelPropertiesFromSchema(schema, property.Value.TableName)
             .ToArray();
     }
 
-    public object? GetObject()
+    public object? GetObject(IDataRecord reader)
     {
         if (_properties.Length == 0)
         {
@@ -34,14 +34,28 @@ internal class ForeignTableConverter
         {
             var oridnal = currentProperty.Column.ColumnOrdinal!.Value;
 
-            if (currentProperty.Column.AllowDBNull.GetValueOrDefault() && _dataReader.IsDBNull(oridnal))
+            if (currentProperty.Column.AllowDBNull.GetValueOrDefault() && reader.IsDBNull(oridnal))
             {
                 return null;
             }
 
-            currentProperty.SetDataReaderValue(newObject, _dataReader);
+            currentProperty.SetDataReaderValue(newObject, reader);
         }
 
         return newObject;
+    }
+
+    public ICollection GetObjects(IEnumerable<IDataRecord> readers)
+    {
+        var collection = Array.CreateInstance(_type, readers.Count());
+        var index = 0;
+
+        foreach (var currentReader in readers)
+        {
+            collection.SetValue(GetObject(currentReader), index);
+            index++;
+        }
+
+        return collection;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Data.Common;
+﻿using System.Data;
 using System.Reflection;
 using TrustyORM.ModelInteractions;
 
@@ -13,7 +13,6 @@ internal static class MapperPropertyExtensions
     /// <exception cref="InvalidCastException"></exception>
     private static object? GetValueOrThrowExceptionIfPropertyIsNotNullableType(this PropertyInfo property, object readerValue)
     {
-        return readerValue;
         Type propertyType = property.PropertyType;
 
         if (readerValue is not DBNull)
@@ -34,15 +33,7 @@ internal static class MapperPropertyExtensions
         throw new InvalidCastException($"Поле {property.Name} вернуло NULL, тогда как тип не принимает такие значения");
     }
 
-    private static void SetValue(this PropertyInfo property, object obj, string columnName, DbDataReader dataReader)
-    {
-        object readerValue = dataReader[columnName];
-        object? value = property.GetValueOrThrowExceptionIfPropertyIsNotNullableType(readerValue);
-
-        property.SetValue(obj, value);
-    }
-
-    private static void SetValue(this PropertyInfo property, object obj, int columnOrdinal, DbDataReader dataReader)
+    private static void SetValue(this PropertyInfo property, object obj, int columnOrdinal, IDataRecord dataReader)
     {
         object readerValue = dataReader[columnOrdinal];
         object? value = property.GetValueOrThrowExceptionIfPropertyIsNotNullableType(readerValue);
@@ -50,12 +41,20 @@ internal static class MapperPropertyExtensions
         property.SetValue(obj, value);
     }
 
-    public static void SetDataReaderValue(this PropertyInfo property, object obj, DbDataReader dataReader) =>
+    private static void SetValue(this PropertyInfo property, object obj, string columnName, IDataRecord dataReader)
+    {
+        object readerValue = dataReader[columnName];
+        object? value = property.GetValueOrThrowExceptionIfPropertyIsNotNullableType(readerValue);
+
+        property.SetValue(obj, value);
+    }
+
+    public static void SetDataReaderValue(this PropertyInfo property, object obj, IDataRecord dataReader) =>
         property.SetValue(obj, property.Name, dataReader);
 
-    public static void SetDataReaderValue(this KeyValuePair<PropertyInfo, ColumnAttribute> property, object obj, DbDataReader dataReader) =>
+    public static void SetDataReaderValue(this KeyValuePair<PropertyInfo, ColumnAttribute> property, object obj, IDataRecord dataReader) =>
         property.Key.SetValue(obj, property.Value.Name, dataReader);
 
-    public static void SetDataReaderValue(this MapperPropertyInformation mapperProperty, object obj, DbDataReader dataReader) =>
-        mapperProperty.Property.SetValue(obj, mapperProperty.Column.ColumnOrdinal.Value, dataReader);
+    public static void SetDataReaderValue(this MapperPropertyInformation mapperProperty, object obj, IDataRecord dataReader) =>
+        mapperProperty.Property.SetValue(obj, mapperProperty.Column.ColumnOrdinal!.Value, dataReader);
 }

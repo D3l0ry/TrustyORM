@@ -6,6 +6,6 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        BenchmarkRunner.Run<BenchamarkMethods>(/*DefaultConfig.Instance.WithOption(ConfigOptions.DisableOptimizationsValidator, true)*/);
+        BenchmarkRunner.Run<BencmarkTrustyMethods>(/*DefaultConfig.Instance.WithOption(ConfigOptions.DisableOptimizationsValidator, true)*/);
     }
 }

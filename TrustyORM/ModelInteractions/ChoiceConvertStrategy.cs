@@ -5,7 +5,7 @@ using TrustyORM.ModelInteractions.ConvertStrategies;
 namespace TrustyORM.ModelInteractions;
 internal static class ChoiceConvertStrategy
 {
-    public static ConvertStrategyContext<T> GetStrategy<T>(DbDataReader dataReader)
+    public static ConvertStrategyContext<T?> GetStrategy<T>(DbDataReader dataReader)
     {
         ArgumentNullException.ThrowIfNull(dataReader);
 
@@ -18,9 +18,9 @@ internal static class ChoiceConvertStrategy
                 throw new InvalidCastException($"Не удалось преобразовать значения из запроса в тип модели {type}");
             }
 
-            return new SystemTypeConvertStrategy<T>(dataReader);
+            return new SystemTypeConvertStrategy<T?>(dataReader);
         }
 
-        return new ModelConvertStrategy<T>(dataReader);
+        return new ModelConvertStrategy<T?>(dataReader);
     }
 }

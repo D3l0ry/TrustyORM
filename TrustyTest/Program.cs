@@ -24,11 +24,10 @@ internal class Program
         //var users0 = Dapper.SqlMapper.Query<User>(connection, "SELECT * FROM [User]", buffered: false);
         //var users2 = connection.Query<User>("SELECT * FROM [User]").Where(x => x.Id == 999002).ToArray();
         //var test = connection.Query<User>("SELECT * FROM [User]");
-
-        var users = connection.Query<User>("SELECT * FROM [User]").ToArray();
+        var users = connection.Query<User>("SELECT * FROM [User] JOIN Profile ON Profile.Id =[User].ProfileId").ToArray();
         foreach (var currentUser in users)
         {
-            Console.WriteLine($"Номер:{currentUser.Id}; Login:{currentUser.Login};FirstName:{currentUser.Profile?.FirstName}");
+            Console.WriteLine($"Номер:{currentUser.Id}; Login:{currentUser.Login};");
         }
 
         //foreach (var currentUser in test)
@@ -61,7 +60,7 @@ internal class Program
         public string Password { get; set; }
 
         [ForeignTable("Profile")]
-        public Profile Profile { get; set; }
+        public ICollection<Profile> Profiles { get; set; }
     }
 
     private class Profile
