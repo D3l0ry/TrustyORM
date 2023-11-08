@@ -52,9 +52,6 @@ internal static class MapperPropertyExtensions
     public static void SetDataReaderValue(this PropertyInfo property, object obj, IDataRecord dataReader) =>
         property.SetValue(obj, property.Name, dataReader);
 
-    public static void SetDataReaderValue(this KeyValuePair<PropertyInfo, ColumnAttribute> property, object obj, IDataRecord dataReader) =>
-        property.Key.SetValue(obj, property.Value.Name, dataReader);
-
     public static void SetDataReaderValue(this ModelPropertyInformation mapperProperty, object obj, IDataRecord dataReader) =>
         mapperProperty.Property.SetValue(obj, mapperProperty.Column.ColumnOrdinal!.Value, dataReader);
 

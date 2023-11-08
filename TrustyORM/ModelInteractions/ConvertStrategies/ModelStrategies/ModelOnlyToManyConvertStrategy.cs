@@ -1,25 +1,13 @@
 ﻿using System.Data;
 using System.Data.Common;
-using System.Reflection;
 using TrustyORM.Extensions;
 
 namespace TrustyORM.ModelInteractions.ConvertStrategies;
-internal class ModelOnlyToManyConvertStrategy<T> : ConvertStrategyContext<T>
+internal class ModelOnlyToManyConvertStrategy<T> : ModelConvertStrategyBase<T>
 {
-    private readonly IEnumerable<DbColumn> _schema;
-    private readonly ModelPropertyInformation[] _properties;
-    private readonly KeyValuePair<PropertyInfo, ForeignTableAttribute>[] _foreignTableProperties;
-
     private IGrouping<object, IDataRecord>? _currentGroupRecord;
 
-    public ModelOnlyToManyConvertStrategy(DbDataReader dataReader) : base(dataReader)
-    {
-        var type = typeof(T);
-
-        _schema = dataReader.GetColumnSchema();
-        _properties = type.GetModelPropertiesFromSchema(_schema).ToArray();
-        _foreignTableProperties = type.GetForeignTableProperties();
-    }
+    public ModelOnlyToManyConvertStrategy(DbDataReader dataReader) : base(dataReader) { }
 
     protected override T? GetObject()
     {
@@ -29,14 +17,14 @@ internal class ModelOnlyToManyConvertStrategy<T> : ConvertStrategyContext<T>
 
         T newObject = Activator.CreateInstance<T>();
 
-        foreach (var currentProperty in _properties)
+        foreach (var currentProperty in Properties)
         {
             currentProperty.SetDataReaderValue(newObject!, firstReader);
         }
 
-        foreach (var currentForeignTable in _foreignTableProperties)
+        foreach (var currentForeignTable in ForeignTableProperties)
         {
-            var foreignTableConverter = new ForeignTableConverter(currentForeignTable, _schema);
+            var foreignTableConverter = new ForeignTableConverter(currentForeignTable, Schema);
             var result = default(object);
 
             if (currentForeignTable.IsCollection())
@@ -58,7 +46,7 @@ internal class ModelOnlyToManyConvertStrategy<T> : ConvertStrategyContext<T>
     {
         using (Reader)
         {
-            var primaryKeyProperty = _properties.FirstOrDefault(currentProperty => currentProperty.Column.IsKey.GetValueOrDefault());
+            var primaryKeyProperty = Properties.FirstOrDefault(currentProperty => currentProperty.Column.IsKey.GetValueOrDefault());
 
             if (primaryKeyProperty == null)
             {
