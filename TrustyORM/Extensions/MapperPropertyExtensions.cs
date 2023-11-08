@@ -55,6 +55,15 @@ internal static class MapperPropertyExtensions
     public static void SetDataReaderValue(this KeyValuePair<PropertyInfo, ColumnAttribute> property, object obj, IDataRecord dataReader) =>
         property.Key.SetValue(obj, property.Value.Name, dataReader);
 
-    public static void SetDataReaderValue(this MapperPropertyInformation mapperProperty, object obj, IDataRecord dataReader) =>
+    public static void SetDataReaderValue(this ModelPropertyInformation mapperProperty, object obj, IDataRecord dataReader) =>
         mapperProperty.Property.SetValue(obj, mapperProperty.Column.ColumnOrdinal!.Value, dataReader);
+
+    public static bool IsCollection(this KeyValuePair<PropertyInfo, ForeignTableAttribute> property)
+    {
+        ArgumentNullException.ThrowIfNull(property.Key);
+
+        var propertyType = property.Key.PropertyType;
+
+        return propertyType.IsArray || propertyType.GetGenericTypeDefinition() == typeof(ICollection<>);
+    }
 }

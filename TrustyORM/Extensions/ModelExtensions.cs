@@ -67,7 +67,7 @@ internal static class ModelExtensions
         return modelProperties;
     }
 
-    public static IEnumerable<MapperPropertyInformation> GetModelPropertiesFromSchema(this Type type, IEnumerable<DbColumn> schema)
+    public static IEnumerable<ModelPropertyInformation> GetModelPropertiesFromSchema(this Type type, IEnumerable<DbColumn> schema)
     {
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(schema);
@@ -86,11 +86,11 @@ internal static class ModelExtensions
                 throw new MissingFieldException($"Столбец с именем {currentProperty.Value.Name} не найден при получении полей внешней таблицы");
             }
 
-            yield return new MapperPropertyInformation(currentProperty.Key, foundColumnSchema);
+            yield return new ModelPropertyInformation(currentProperty.Key, foundColumnSchema);
         }
     }
 
-    public static IEnumerable<MapperPropertyInformation> GetModelPropertiesFromSchema(this Type type, IEnumerable<DbColumn> schema, string tableName)
+    public static IEnumerable<ModelPropertyInformation> GetModelPropertiesFromSchema(this Type type, IEnumerable<DbColumn> schema, string tableName)
     {
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(schema);
@@ -101,5 +101,14 @@ internal static class ModelExtensions
             .ToArray();
 
         return type.GetModelPropertiesFromSchema(selectedTableColumnsSchema);
+    }
+
+    public static bool IsModelRelationOnlyToMany(this Type type)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+
+        var foreignTableProperties = type.GetForeignTableProperties();
+
+        return foreignTableProperties.Any(currentProperty => currentProperty.Key.PropertyType.IsArray || (currentProperty.Key.PropertyType.IsGenericType && currentProperty.Key.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>)));
     }
 }

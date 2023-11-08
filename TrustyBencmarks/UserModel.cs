@@ -72,7 +72,7 @@ public class UserModelForeignTableCollection
     public string Password { get; set; }
 
     [ForeignTable("Profile")]
-    public ICollection<ProfileModel> Profiles { get; set; }
+    public ProfileModel Profiles { get; set; }
 }
 
 public class ProfileModel

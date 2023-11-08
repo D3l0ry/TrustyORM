@@ -26,7 +26,7 @@ public static class SqlMapper
                 connection.Open();
             }
 
-            var reader = connection.ExecuteReader(query);
+            var reader = connection.ExecuteReader(query, CommandBehavior.KeyInfo);
             var converter = ChoiceConvertStrategy.GetStrategy<T?>(reader);
 
             return converter;

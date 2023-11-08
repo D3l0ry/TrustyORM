@@ -10,6 +10,7 @@ internal static class ChoiceConvertStrategy
         ArgumentNullException.ThrowIfNull(dataReader);
 
         Type type = typeof(T);
+        var selectedStrategy = default(ConvertStrategyContext<T?>);
 
         if (type.IsSystemType())
         {
@@ -18,9 +19,17 @@ internal static class ChoiceConvertStrategy
                 throw new InvalidCastException($"Не удалось преобразовать значения из запроса в тип модели {type}");
             }
 
-            return new SystemTypeConvertStrategy<T?>(dataReader);
+            selectedStrategy = new SystemTypeConvertStrategy<T?>(dataReader);
+        }
+        if (type.IsModelRelationOnlyToMany())
+        {
+            selectedStrategy = new ModelOnlyToManyConvertStrategy<T?>(dataReader);
+        }
+        else
+        {
+            selectedStrategy = new ModelConvertStrategy<T?>(dataReader);
         }
 
-        return new ModelConvertStrategy<T?>(dataReader);
+        return selectedStrategy;
     }
 }

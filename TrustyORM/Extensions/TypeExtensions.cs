@@ -5,19 +5,20 @@ internal static class TypeExtensions
     {
         ArgumentNullException.ThrowIfNull(type);
 
-        return type == typeof(bool) || type == typeof(bool?)
-            || type == typeof(byte) || type == typeof(byte?)
-            || type == typeof(sbyte) || type == typeof(sbyte?)
-            || type == typeof(short) || type == typeof(short?)
-            || type == typeof(ushort) || type == typeof(ushort?)
-            || type == typeof(int) || type == typeof(int?)
-            || type == typeof(uint) || type == typeof(uint?)
-            || type == typeof(long) || type == typeof(long?)
-            || type == typeof(ulong) || type == typeof(ulong?)
-            || type == typeof(float) || type == typeof(float?)
-            || type == typeof(double) || type == typeof(double?)
+        if (type.IsPrimitive)
+        {
+            return true;
+        }
+
+        var nullableType = Nullable.GetUnderlyingType(type);
+
+        if (nullableType != null && nullableType.IsPrimitive)
+        {
+            return true;
+        }
+
+        return type == typeof(string)
             || type == typeof(decimal) || type == typeof(decimal?)
-            || type == typeof(string)
             || type == typeof(DateTime) || type == typeof(DateTime?)
             || type == typeof(Guid) || type == typeof(Guid?);
     }

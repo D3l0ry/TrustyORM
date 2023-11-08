@@ -2,12 +2,12 @@
 using System.Reflection;
 
 namespace TrustyORM.ModelInteractions;
-internal class MapperPropertyInformation
+internal class ModelPropertyInformation
 {
     private readonly PropertyInfo _property;
     private readonly DbColumn _column;
 
-    public MapperPropertyInformation(PropertyInfo property, DbColumn column)
+    public ModelPropertyInformation(PropertyInfo property, DbColumn column)
     {
         ArgumentNullException.ThrowIfNull(property);
         ArgumentNullException.ThrowIfNull(column);
