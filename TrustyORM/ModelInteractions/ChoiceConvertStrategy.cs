@@ -9,7 +9,7 @@ internal static class ChoiceConvertStrategy
     {
         ArgumentNullException.ThrowIfNull(dataReader);
 
-        Type type = typeof(T);
+        var type = typeof(T);
         var selectedStrategy = default(ConvertStrategyContext<T?>);
 
         if (type.IsSystemType())
