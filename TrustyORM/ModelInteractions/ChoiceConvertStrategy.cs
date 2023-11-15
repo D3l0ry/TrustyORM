@@ -1,6 +1,7 @@
 ﻿using System.Data.Common;
 using TrustyORM.Extensions;
 using TrustyORM.ModelInteractions.ConvertStrategies;
+using TrustyORM.ModelInteractions.ConvertStrategies.ModelStrategies;
 
 namespace TrustyORM.ModelInteractions;
 internal static class ChoiceConvertStrategy
@@ -27,7 +28,7 @@ internal static class ChoiceConvertStrategy
         }
         else
         {
-            selectedStrategy = new ModelConvertStrategy<T?>(dataReader);
+            selectedStrategy = new ModelOnlyToOnlyConvertStrategy<T?>(dataReader);
         }
 
         return selectedStrategy;

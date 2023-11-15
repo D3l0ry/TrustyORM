@@ -1,10 +1,10 @@
 ﻿using System.Data.Common;
 using TrustyORM.Extensions;
 
-namespace TrustyORM.ModelInteractions.ConvertStrategies;
-internal class ModelConvertStrategy<T> : ModelConvertStrategyBase<T>
+namespace TrustyORM.ModelInteractions.ConvertStrategies.ModelStrategies;
+internal class ModelOnlyToOnlyConvertStrategy<T> : ModelConvertStrategyBase<T>
 {
-    public ModelConvertStrategy(DbDataReader dataReader) : base(dataReader) { }
+    public ModelOnlyToOnlyConvertStrategy(DbDataReader dataReader) : base(dataReader) { }
 
     protected override T? GetObject()
     {

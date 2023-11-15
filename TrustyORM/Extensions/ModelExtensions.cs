@@ -4,14 +4,14 @@ using System.Reflection;
 namespace TrustyORM.ModelInteractions;
 internal static class ModelExtensions
 {
-    private static readonly Dictionary<Type, KeyValuePair<PropertyInfo, ColumnAttribute>[]> _propertiesDictionary = new();
+    private static readonly Dictionary<Type, KeyValuePair<PropertyInfo, ColumnAttribute>[]> _modelPropertiesDictionary = new();
     private static readonly Dictionary<Type, KeyValuePair<PropertyInfo, ForeignTableAttribute>[]> _foreignTablePropertiesDictionary = new();
 
     public static KeyValuePair<PropertyInfo, ColumnAttribute>[] GetModelProperties(this Type type)
     {
         ArgumentNullException.ThrowIfNull(type);
 
-        if (_propertiesDictionary.TryGetValue(type, out var result))
+        if (_modelPropertiesDictionary.TryGetValue(type, out var result))
         {
             return result;
         }
@@ -32,7 +32,7 @@ internal static class ModelExtensions
         }
 
         var modelProperties = list.ToArray();
-        _propertiesDictionary.Add(type, modelProperties);
+        _modelPropertiesDictionary.Add(type, modelProperties);
 
         return modelProperties;
     }
@@ -109,6 +109,21 @@ internal static class ModelExtensions
 
         var foreignTableProperties = type.GetForeignTableProperties();
 
-        return foreignTableProperties.Any(currentProperty => currentProperty.Key.PropertyType.IsArray || (currentProperty.Key.PropertyType.IsGenericType && currentProperty.Key.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>)));
+        foreach (var currentProperty in foreignTableProperties)
+        {
+            var propertyType = currentProperty.Key.PropertyType;
+
+            if (propertyType.IsArray)
+            {
+                return true;
+            }
+
+            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
