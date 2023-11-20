@@ -3,6 +3,8 @@
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class ColumnAttribute : Attribute
 {
+    public ColumnAttribute() { }
+
     public ColumnAttribute(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
