@@ -22,7 +22,7 @@ internal partial class Program
         //    command.ExecuteNonQuery();
         //}
 
-        var users = connection.Query<User>("SELECT TOP(2) * FROM [User] JOIN Profile ON Profile.Id =[User].ProfileId").ToArray();
+        var users = connection.Query<User>("SELECT TOP(1) * FROM [User] JOIN Profile ON Profile.Id=[User].ProfileId").ToArray();
         foreach (var currentUser in users)
         {
             Console.WriteLine($"Номер:{currentUser.Id}; Login:{currentUser.Login};");

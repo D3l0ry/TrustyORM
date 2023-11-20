@@ -1,36 +1,28 @@
 ﻿using System.Data.Common;
 using TrustyORM.Extensions;
 using TrustyORM.ModelInteractions.ConvertStrategies;
-using TrustyORM.ModelInteractions.ConvertStrategies.ModelStrategies;
 
 namespace TrustyORM.ModelInteractions;
-internal static class ChoiceConvertStrategy
+internal static class ChoiceConvertStrategy<T>
 {
-    public static ConvertStrategyContext<T?> GetStrategy<T>(DbDataReader dataReader)
+    private static readonly bool _isSystemType;
+
+    static ChoiceConvertStrategy() => _isSystemType = typeof(T).IsSystemType();
+
+    public static ConvertStrategyContext<T?> GetStrategy(DbDataReader dataReader)
     {
         ArgumentNullException.ThrowIfNull(dataReader);
 
-        var type = typeof(T);
-        var selectedStrategy = default(ConvertStrategyContext<T?>);
-
-        if (type.IsSystemType())
+        if (_isSystemType)
         {
             if (dataReader.VisibleFieldCount != 1)
             {
-                throw new InvalidCastException($"Не удалось преобразовать значения из запроса в тип модели {type}");
+                throw new InvalidCastException($"Не удалось преобразовать значения из запроса в тип модели {typeof(T)}");
             }
 
-            selectedStrategy = new SystemTypeConvertStrategy<T?>(dataReader);
-        }
-        if (type.IsModelRelationOnlyToMany())
-        {
-            selectedStrategy = new ModelOnlyToManyConvertStrategy<T?>(dataReader);
-        }
-        else
-        {
-            selectedStrategy = new ModelOnlyToOnlyConvertStrategy<T?>(dataReader);
+            return new SystemTypeConvertStrategy<T?>(dataReader);
         }
 
-        return selectedStrategy;
+        return new ModelConvertStrategy<T?>(dataReader);
     }
 }

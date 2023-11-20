@@ -3,8 +3,6 @@
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class ColumnAttribute : Attribute
 {
-    private readonly string _name;
-
     public ColumnAttribute(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -12,11 +10,11 @@ public class ColumnAttribute : Attribute
             throw new ArgumentNullException(nameof(name));
         }
 
-        _name = name;
+        Name = name;
     }
 
     /// <summary>
     /// Наименование колонки
     /// </summary>
-    public string Name => _name;
+    internal string? Name { get; set; }
 }

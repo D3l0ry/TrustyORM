@@ -9,7 +9,7 @@ internal class ModelOnlyToManyConvertStrategy<T> : ModelConvertStrategyBase<T>
 
     public ModelOnlyToManyConvertStrategy(DbDataReader dataReader) : base(dataReader) { }
 
-    protected override T? GetObject()
+    public override T? GetObject()
     {
         ArgumentNullException.ThrowIfNull(_currentGroupRecord);
 
@@ -22,21 +22,20 @@ internal class ModelOnlyToManyConvertStrategy<T> : ModelConvertStrategyBase<T>
             currentProperty.SetDataReaderValue(newObject!, firstReader);
         }
 
-        foreach (var currentForeignTable in ForeignTableProperties)
+        foreach (var currentConverter in ForeignTableConverters)
         {
-            var foreignTableConverter = new ForeignTableConverter(currentForeignTable, Schema);
             var result = default(object);
 
-            if (currentForeignTable.IsCollection())
+            if (currentConverter.IsCollection)
             {
-                result = foreignTableConverter.GetObjects(_currentGroupRecord.AsEnumerable());
+                result = currentConverter.GetObjects(_currentGroupRecord.AsEnumerable());
             }
             else
             {
-                result = foreignTableConverter.GetObject(firstReader);
+                result = currentConverter.GetObject(firstReader);
             }
 
-            currentForeignTable.Key.SetValue(newObject, result);
+            currentConverter.Property.SetValue(newObject, result);
         }
 
         return newObject;

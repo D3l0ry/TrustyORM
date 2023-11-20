@@ -1,5 +1,7 @@
-﻿using System.Data.Common;
+﻿using System.Data;
+using System.Data.Common;
 using System.Reflection;
+using TrustyORM.ModelInteractions.ConvertStrategies;
 
 namespace TrustyORM.ModelInteractions;
 internal static class ModelExtensions
@@ -25,7 +27,11 @@ internal static class ModelExtensions
 
             if (columnAttribute != null)
             {
-                list.Add(new KeyValuePair<PropertyInfo, ColumnAttribute>(currentProperty, columnAttribute));
+                columnAttribute.Name ??= currentProperty.Name;
+
+                var newPropertyValuePair = new KeyValuePair<PropertyInfo, ColumnAttribute>(currentProperty, columnAttribute);
+
+                list.Add(newPropertyValuePair);
 
                 continue;
             }
@@ -77,9 +83,12 @@ internal static class ModelExtensions
             yield break;
         }
 
-        foreach (var currentProperty in type.GetModelProperties())
+        var modelProperties = type.GetModelProperties();
+
+        foreach (var currentProperty in modelProperties)
         {
-            var foundColumnSchema = schema.FirstOrDefault(currentColumn => currentColumn.ColumnName == currentProperty.Value.Name);
+            var columnAttribute = currentProperty.Value;
+            var foundColumnSchema = schema.FirstOrDefault(currentColumn => currentColumn.ColumnName == columnAttribute.Name);
 
             if (foundColumnSchema == null)
             {
@@ -103,6 +112,16 @@ internal static class ModelExtensions
         return type.GetModelPropertiesFromSchema(selectedTableColumnsSchema);
     }
 
+    public static IEnumerable<ForeignTableConverter> GetForeignTableConverters(this Type type, IEnumerable<DbColumn> schema)
+    {
+        var modelForeignTableProperties = type.GetForeignTableProperties();
+
+        foreach (var currentProperty in modelForeignTableProperties)
+        {
+            yield return new ForeignTableConverter(currentProperty, schema);
+        }
+    }
+
     public static bool IsModelRelationOnlyToMany(this Type type)
     {
         ArgumentNullException.ThrowIfNull(type);
@@ -118,7 +137,7 @@ internal static class ModelExtensions
                 return true;
             }
 
-            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
+            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
                 return true;
             }

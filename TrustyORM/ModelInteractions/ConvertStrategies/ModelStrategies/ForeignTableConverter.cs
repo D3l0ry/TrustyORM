@@ -7,7 +7,9 @@ using TrustyORM.Extensions;
 namespace TrustyORM.ModelInteractions.ConvertStrategies;
 internal class ForeignTableConverter
 {
-    private readonly Type _type;
+    private readonly PropertyInfo _property;
+    private readonly Type _propertyBaseType;
+    private readonly bool _isCollection;
     private readonly ModelPropertyInformation[] _properties;
 
     public ForeignTableConverter(KeyValuePair<PropertyInfo, ForeignTableAttribute> property, IEnumerable<DbColumn> schema)
@@ -15,29 +17,36 @@ internal class ForeignTableConverter
         ArgumentNullException.ThrowIfNull(property);
         ArgumentNullException.ThrowIfNull(schema);
 
+        _property = property.Key;
         var propertyType = property.Key.PropertyType;
 
         if (propertyType.IsArray)
         {
-            _type = propertyType.GetElementType()!;
+            _propertyBaseType = propertyType.GetElementType()!;
+            _isCollection = true;
         }
         else if (propertyType.IsGenericType)
         {
-            _type = property.Key.PropertyType.GetGenericArguments().First();
+            _propertyBaseType = propertyType.GetGenericArguments().First();
+            _isCollection = true;
         }
         else
         {
-            _type = propertyType;
+            _propertyBaseType = propertyType;
         }
 
-        _properties = _type
+        _properties = _propertyBaseType
             .GetModelPropertiesFromSchema(schema, property.Value.TableName)
             .ToArray();
     }
 
+    public PropertyInfo Property => _property;
+
+    public bool IsCollection => _isCollection;
+
     private object? GetInternalObject(IDataRecord reader)
     {
-        var newObject = Activator.CreateInstance(_type);
+        var newObject = Activator.CreateInstance(_propertyBaseType);
 
         foreach (var currentProperty in _properties)
         {
@@ -71,7 +80,7 @@ internal class ForeignTableConverter
             return null;
         }
 
-        var collection = Array.CreateInstance(_type, readers.Count());
+        var collection = Array.CreateInstance(_propertyBaseType, readers.Count());
         var index = 0;
 
         foreach (var currentReader in readers)

@@ -5,19 +5,19 @@ namespace TrustyBencmarks;
 
 public class UserModel
 {
-    [Column("Id")]
+    [Column]
     public int Id { get; set; }
 
-    [Column("ProfileId")]
+    [Column]
     public int ProfileId { get; set; }
 
-    [Column("Login")]
+    [Column]
     public string Login { get; set; }
 
-    [Column("Email")]
+    [Column]
     public string Email { get; set; }
 
-    [Column("Password")]
+    [Column]
     public string Password { get; set; }
 
     //[ForeignTable("Profile")]

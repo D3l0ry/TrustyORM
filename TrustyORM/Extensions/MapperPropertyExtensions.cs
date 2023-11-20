@@ -61,6 +61,6 @@ internal static class MapperPropertyExtensions
 
         var propertyType = property.Key.PropertyType;
 
-        return propertyType.IsArray || propertyType.GetGenericTypeDefinition() == typeof(ICollection<>);
+        return propertyType.IsArray || propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
     }
 }

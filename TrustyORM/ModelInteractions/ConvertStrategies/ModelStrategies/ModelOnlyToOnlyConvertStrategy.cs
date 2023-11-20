@@ -6,7 +6,7 @@ internal class ModelOnlyToOnlyConvertStrategy<T> : ModelConvertStrategyBase<T>
 {
     public ModelOnlyToOnlyConvertStrategy(DbDataReader dataReader) : base(dataReader) { }
 
-    protected override T? GetObject()
+    public override T? GetObject()
     {
         T newObject = Activator.CreateInstance<T>();
 
@@ -15,12 +15,11 @@ internal class ModelOnlyToOnlyConvertStrategy<T> : ModelConvertStrategyBase<T>
             currentProperty.SetDataReaderValue(newObject!, Reader);
         }
 
-        foreach (var currentForeignTable in ForeignTableProperties)
+        foreach (var currentConverter in ForeignTableConverters)
         {
-            var foreignTableConverter = new ForeignTableConverter(currentForeignTable, Schema);
-            var result = foreignTableConverter.GetObject(Reader);
+            var result = currentConverter.GetObject(Reader);
 
-            currentForeignTable.Key.SetValue(newObject, result);
+            currentConverter.Property.SetValue(newObject, result);
         }
 
         return newObject;

@@ -6,16 +6,16 @@ internal partial class Program
 {
     private class Profile
     {
-        [Column("Id")]
+        [Column()]
         public int Id { get; set; }
 
-        [Column("FirstName")]
+        [Column()]
         public string FirstName { get; set; }
 
-        [Column("MiddleName")]
+        [Column()]
         public string MiddleName { get; set; }
 
-        [Column("LastName")]
+        [Column()]
         public string LastName { get; set; }
     }
 }

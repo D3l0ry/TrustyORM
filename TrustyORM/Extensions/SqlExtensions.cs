@@ -4,36 +4,41 @@ using System.Data.Common;
 namespace TrustyORM;
 public static class SqlExtensions
 {
-    public static DbCommand CreateCommand(this DbConnection connection, string query)
+    public static DbCommand CreateCommand(this DbConnection connection, string query, CommandType commandType)
     {
         ArgumentNullException.ThrowIfNull(connection);
         ArgumentNullException.ThrowIfNull(query);
 
         var command = connection.CreateCommand();
         command.CommandText = query;
+        command.CommandType = commandType;
 
         return command;
     }
 
-    public static DbDataReader ExecuteReader(this DbConnection connection, string query)
+    public static DbCommand CreateCommand(this DbConnection connection, string query)
     {
-        var command = connection.CreateCommand(query);
+        ArgumentNullException.ThrowIfNull(connection);
+        ArgumentNullException.ThrowIfNull(query);
 
-        return command.ExecuteReader();
+        var command = connection.CreateCommand(query, CommandType.Text);
+
+        return command;
     }
 
-    public static DbDataReader ExecuteReader(this DbConnection connection, string query, CommandBehavior behavior)
+    public static DbCommand CreateCommand(this DbConnection connection, string query, CommandType commandType, params DbParameter[] parameters)
     {
-        var command = connection.CreateCommand(query);
+        ArgumentNullException.ThrowIfNull(parameters);
 
-        return command.ExecuteReader(behavior);
+        var command = connection.CreateCommand(query, commandType);
+        command.Parameters.AddRange(parameters);
+
+        return command;
     }
 
-    public static int ExecuteNonQuery(this DbConnection connection, string query)
+    public static DbCommand CreateCommand(this DbConnection connection, string query, params DbParameter[] parameters)
     {
-        var command = connection.CreateCommand(query);
-
-        return command.ExecuteNonQuery();
+        return connection.CreateCommand(query, CommandType.Text, parameters);
     }
 
     public static IEnumerable<IDataRecord> Enumerate(this DbDataReader reader)
@@ -43,9 +48,9 @@ public static class SqlExtensions
             yield break;
         }
 
-        foreach (IDataRecord currentReader in reader)
+        foreach (IDataRecord currentRecord in reader)
         {
-            yield return currentReader;
+            yield return currentRecord;
         }
     }
 }

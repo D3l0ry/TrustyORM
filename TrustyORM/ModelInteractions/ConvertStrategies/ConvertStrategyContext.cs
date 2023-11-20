@@ -17,7 +17,7 @@ internal abstract class ConvertStrategyContext<T> : IEnumerable<T?>
 
     public virtual DbDataReader Reader => _dataReader;
 
-    protected abstract T? GetObject();
+    public abstract T? GetObject();
 
     public virtual IEnumerator<T?> GetEnumerator()
     {
