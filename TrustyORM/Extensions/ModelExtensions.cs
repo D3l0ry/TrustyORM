@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
 using System.Reflection;
+using TrustyORM.Extensions;
 using TrustyORM.ModelInteractions.ConvertStrategies;
 
 namespace TrustyORM.ModelInteractions;
@@ -19,7 +20,7 @@ internal static class ModelExtensions
         }
 
         var list = new List<KeyValuePair<PropertyInfo, ColumnAttribute>>();
-        var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        var properties = type.GetProperties();
 
         foreach (var currentProperty in properties)
         {
@@ -53,7 +54,7 @@ internal static class ModelExtensions
         }
 
         var list = new List<KeyValuePair<PropertyInfo, ForeignTableAttribute>>();
-        var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        var properties = type.GetProperties();
 
         foreach (var currentProperty in properties)
         {
@@ -130,14 +131,7 @@ internal static class ModelExtensions
 
         foreach (var currentProperty in foreignTableProperties)
         {
-            var propertyType = currentProperty.Key.PropertyType;
-
-            if (propertyType.IsArray)
-            {
-                return true;
-            }
-
-            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            if (currentProperty.IsCollection())
             {
                 return true;
             }

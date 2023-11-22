@@ -3,11 +3,11 @@ using TrustyORM.Extensions;
 using TrustyORM.ModelInteractions.ConvertStrategies;
 
 namespace TrustyORM.ModelInteractions;
-internal static class ChoiceConvertStrategy<T>
+internal static class ConvertStrategy<T>
 {
     private static readonly bool _isSystemType;
 
-    static ChoiceConvertStrategy() => _isSystemType = typeof(T).IsSystemType();
+    static ConvertStrategy() => _isSystemType = typeof(T).IsSystemType();
 
     public static ConvertStrategyContext<T?> GetStrategy(DbDataReader dataReader)
     {

@@ -4,24 +4,31 @@ using System.Data.Common;
 namespace TrustyORM;
 public static class SqlExtensions
 {
-    public static DbCommand CreateCommand(this DbConnection connection, string query, CommandType commandType)
+    public static DbCommand CreateCommand(this DbConnection connection, string query)
     {
         ArgumentNullException.ThrowIfNull(connection);
         ArgumentNullException.ThrowIfNull(query);
 
         var command = connection.CreateCommand();
         command.CommandText = query;
-        command.CommandType = commandType;
 
         return command;
     }
 
-    public static DbCommand CreateCommand(this DbConnection connection, string query)
+    public static DbCommand CreateCommand(this DbConnection connection, string query, params DbParameter[] parameters)
     {
-        ArgumentNullException.ThrowIfNull(connection);
-        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(parameters);
 
-        var command = connection.CreateCommand(query, CommandType.Text);
+        var command = connection.CreateCommand(query);
+        command.Parameters.AddRange(parameters);
+
+        return command;
+    }
+
+    public static DbCommand CreateCommand(this DbConnection connection, string query, CommandType commandType)
+    {
+        var command = connection.CreateCommand(query);
+        command.CommandType = commandType;
 
         return command;
     }
@@ -34,11 +41,6 @@ public static class SqlExtensions
         command.Parameters.AddRange(parameters);
 
         return command;
-    }
-
-    public static DbCommand CreateCommand(this DbConnection connection, string query, params DbParameter[] parameters)
-    {
-        return connection.CreateCommand(query, CommandType.Text, parameters);
     }
 
     public static IEnumerable<IDataRecord> Enumerate(this DbDataReader reader)
