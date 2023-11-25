@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Reflection;
 using TrustyORM.Extensions;
 using TrustyORM.ModelInteractions.ConvertStrategies;
@@ -12,7 +11,10 @@ internal static class ModelExtensions
 
     public static KeyValuePair<PropertyInfo, ColumnAttribute>[] GetModelProperties(this Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        if (type == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
 
         if (_modelPropertiesDictionary.TryGetValue(type, out var result))
         {
@@ -46,7 +48,10 @@ internal static class ModelExtensions
 
     public static KeyValuePair<PropertyInfo, ForeignTableAttribute>[] GetForeignTableProperties(this Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        if (type == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
 
         if (_foreignTablePropertiesDictionary.TryGetValue(type, out var result))
         {
@@ -76,8 +81,15 @@ internal static class ModelExtensions
 
     public static IEnumerable<ModelPropertyInformation> GetModelPropertiesFromSchema(this Type type, IEnumerable<DbColumn> schema)
     {
-        ArgumentNullException.ThrowIfNull(type);
-        ArgumentNullException.ThrowIfNull(schema);
+        if (type == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
+
+        if (schema == null)
+        {
+            throw new ArgumentNullException(nameof(schema));
+        }
 
         if (!schema.Any())
         {
@@ -102,9 +114,20 @@ internal static class ModelExtensions
 
     public static IEnumerable<ModelPropertyInformation> GetModelPropertiesFromSchema(this Type type, IEnumerable<DbColumn> schema, string tableName)
     {
-        ArgumentNullException.ThrowIfNull(type);
-        ArgumentNullException.ThrowIfNull(schema);
-        ArgumentNullException.ThrowIfNull(tableName);
+        if (type == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
+
+        if (schema == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
+
+        if (tableName == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
 
         var selectedTableColumnsSchema = schema
             .Where(currentColumn => currentColumn.BaseTableName == tableName)
@@ -125,7 +148,10 @@ internal static class ModelExtensions
 
     public static bool IsModelRelationOnlyToMany(this Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        if (type == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
 
         var foreignTableProperties = type.GetForeignTableProperties();
 

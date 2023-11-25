@@ -8,7 +8,10 @@ public static class SqlMapper
 {
     private static IEnumerable<T?> QueryImpl<T>(this DbCommand command)
     {
-        ArgumentNullException.ThrowIfNull(command);
+        if (command == null)
+        {
+            throw new ArgumentNullException(nameof(command));
+        }
 
         try
         {
@@ -38,8 +41,15 @@ public static class SqlMapper
     /// <exception cref="ArgumentNullException"></exception>
     public static IEnumerable<T?> Query<T>(this DbConnection connection, string query)
     {
-        ArgumentNullException.ThrowIfNull(connection);
-        ArgumentNullException.ThrowIfNull(query);
+        if (connection == null)
+        {
+            throw new ArgumentNullException(nameof(connection));
+        }
+
+        if (query == null)
+        {
+            throw new ArgumentNullException(nameof(query));
+        }
 
         var command = connection.CreateCommand(query);
 
@@ -57,8 +67,15 @@ public static class SqlMapper
     /// <exception cref="ArgumentNullException"></exception>
     public static IEnumerable<T?> Query<T>(this DbConnection connection, string query, params DbParameter[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(connection);
-        ArgumentNullException.ThrowIfNull(query);
+        if (connection == null)
+        {
+            throw new ArgumentNullException(nameof(connection));
+        }
+
+        if (query == null)
+        {
+            throw new ArgumentNullException(nameof(query));
+        }
 
         var command = connection.CreateCommand(query, arguments);
 
@@ -76,9 +93,20 @@ public static class SqlMapper
     /// <exception cref="ArgumentNullException"></exception>
     public static IEnumerable<T?> Query<T>(this DbConnection connection, string query, object arguments)
     {
-        ArgumentNullException.ThrowIfNull(connection);
-        ArgumentNullException.ThrowIfNull(query);
-        ArgumentNullException.ThrowIfNull(arguments);
+        if (connection == null)
+        {
+            throw new ArgumentNullException(nameof(connection));
+        }
+
+        if (query == null)
+        {
+            throw new ArgumentNullException(nameof(query));
+        }
+
+        if (arguments == null)
+        {
+            throw new ArgumentNullException(nameof(arguments));
+        }
 
         var command = connection
             .CreateCommand(query)
@@ -89,8 +117,15 @@ public static class SqlMapper
 
     public static IEnumerable<T?> ExecuteProcedure<T>(this DbConnection connection, string procedure)
     {
-        ArgumentNullException.ThrowIfNull(connection);
-        ArgumentNullException.ThrowIfNull(procedure);
+        if (connection == null)
+        {
+            throw new ArgumentNullException(nameof(connection));
+        }
+
+        if (procedure == null)
+        {
+            throw new ArgumentNullException(nameof(procedure));
+        }
 
         var command = connection.CreateCommand(procedure, CommandType.StoredProcedure);
 
@@ -99,9 +134,20 @@ public static class SqlMapper
 
     public static IEnumerable<T?> ExecuteProcedure<T>(this DbConnection connection, string procedure, params DbParameter[] parameters)
     {
-        ArgumentNullException.ThrowIfNull(connection);
-        ArgumentNullException.ThrowIfNull(procedure);
-        ArgumentNullException.ThrowIfNull(parameters);
+        if (connection == null)
+        {
+            throw new ArgumentNullException(nameof(connection));
+        }
+
+        if (procedure == null)
+        {
+            throw new ArgumentNullException(nameof(procedure));
+        }
+
+        if (parameters == null)
+        {
+            throw new ArgumentNullException(nameof(parameters));
+        }
 
         var command = connection.CreateCommand(procedure, CommandType.StoredProcedure, parameters);
 
@@ -110,8 +156,15 @@ public static class SqlMapper
 
     public static int Execute(this DbConnection connection, string query)
     {
-        ArgumentNullException.ThrowIfNull(connection);
-        ArgumentNullException.ThrowIfNull(query);
+        if (connection == null)
+        {
+            throw new ArgumentNullException(nameof(connection));
+        }
+
+        if (query == null)
+        {
+            throw new ArgumentNullException(nameof(query));
+        }
 
         if (connection.State == ConnectionState.Closed)
         {

@@ -3,7 +3,10 @@ internal static class TypeExtensions
 {
     public static bool IsSystemType(this Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        if (type == null)
+        {
+            throw new ArgumentNullException(nameof(type));
+        }
 
         if (type.IsPrimitive)
         {

@@ -6,8 +6,15 @@ public static class SqlExtensions
 {
     public static DbCommand CreateCommand(this DbConnection connection, string query)
     {
-        ArgumentNullException.ThrowIfNull(connection);
-        ArgumentNullException.ThrowIfNull(query);
+        if (connection == null)
+        {
+            throw new ArgumentNullException(nameof(connection));
+        }
+
+        if (query == null)
+        {
+            throw new ArgumentNullException(nameof(query));
+        }
 
         var command = connection.CreateCommand();
         command.CommandText = query;
@@ -17,7 +24,10 @@ public static class SqlExtensions
 
     public static DbCommand CreateCommand(this DbConnection connection, string query, params DbParameter[] parameters)
     {
-        ArgumentNullException.ThrowIfNull(parameters);
+        if (parameters == null)
+        {
+            throw new ArgumentNullException(nameof(parameters));
+        }
 
         var command = connection.CreateCommand(query);
         command.Parameters.AddRange(parameters);
@@ -35,7 +45,10 @@ public static class SqlExtensions
 
     public static DbCommand CreateCommand(this DbConnection connection, string query, CommandType commandType, params DbParameter[] parameters)
     {
-        ArgumentNullException.ThrowIfNull(parameters);
+        if (parameters == null)
+        {
+            throw new ArgumentNullException(nameof(parameters));
+        }
 
         var command = connection.CreateCommand(query, commandType);
         command.Parameters.AddRange(parameters);

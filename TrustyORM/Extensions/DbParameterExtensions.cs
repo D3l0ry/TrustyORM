@@ -5,8 +5,15 @@ internal static class DbParameterExtensions
 {
     public static DbCommand SetDbParameters(this DbCommand command, object obj)
     {
-        ArgumentNullException.ThrowIfNull(command);
-        ArgumentNullException.ThrowIfNull(obj);
+        if (command == null)
+        {
+            throw new ArgumentNullException(nameof(command));
+        }
+
+        if (obj == null)
+        {
+            throw new ArgumentNullException(nameof(obj));
+        }
 
         var typeFields = obj.GetType().GetProperties();
 

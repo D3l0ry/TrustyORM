@@ -8,7 +8,10 @@ internal abstract class ConvertStrategyContext<T> : IEnumerable<T?>
 
     protected ConvertStrategyContext(DbDataReader dataReader)
     {
-        ArgumentNullException.ThrowIfNull(dataReader);
+        if (dataReader == null)
+        {
+            throw new ArgumentNullException(nameof(dataReader));
+        }
 
         _dataReader = dataReader;
     }

@@ -11,7 +11,10 @@ internal class ModelOnlyToManyConvertStrategy<T> : ModelConvertStrategyBase<T>
 
     public override T? GetObject()
     {
-        ArgumentNullException.ThrowIfNull(_currentGroupRecord);
+        if (_currentGroupRecord == null)
+        {
+            throw new ArgumentNullException(nameof(_currentGroupRecord));
+        }
 
         var firstReader = _currentGroupRecord.First();
 

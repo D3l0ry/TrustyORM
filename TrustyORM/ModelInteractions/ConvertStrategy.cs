@@ -11,7 +11,10 @@ internal static class ConvertStrategy<T>
 
     public static ConvertStrategyContext<T?> GetStrategy(DbDataReader dataReader)
     {
-        ArgumentNullException.ThrowIfNull(dataReader);
+        if (dataReader == null)
+        {
+            throw new ArgumentNullException(nameof(dataReader));
+        }
 
         if (_isSystemType)
         {

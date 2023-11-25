@@ -6,7 +6,7 @@ namespace TrustyORM.Extensions;
 internal static class MapperPropertyExtensions
 {
     /// <summary>
-    /// Выдает исключение, если приссваимое значение равно Null, но свойство не принимает значения типа Null
+    /// Выдает исключение, если присваимое значение равно Null, но свойство не принимает значения типа Null
     /// </summary>
     /// <param name="property"></param>
     /// <param name="readerValue"></param>
@@ -57,10 +57,20 @@ internal static class MapperPropertyExtensions
 
     public static bool IsCollection(this KeyValuePair<PropertyInfo, ForeignTableAttribute> property)
     {
-        ArgumentNullException.ThrowIfNull(property.Key);
+        if (property.Key == null)
+        {
+            throw new ArgumentNullException(nameof(property));
+        }
 
         var propertyType = property.Key.PropertyType;
 
-        return propertyType.IsArray || propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+        if (propertyType.IsArray)
+        {
+            return true;
+        }
+
+        var genericType = propertyType.GetGenericTypeDefinition();
+
+        return genericType == typeof(IEnumerable<>) || genericType == typeof(ICollection<>);
     }
 }

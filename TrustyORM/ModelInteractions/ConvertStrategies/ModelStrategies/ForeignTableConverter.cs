@@ -14,8 +14,15 @@ internal class ForeignTableConverter
 
     public ForeignTableConverter(KeyValuePair<PropertyInfo, ForeignTableAttribute> property, IEnumerable<DbColumn> schema)
     {
-        ArgumentNullException.ThrowIfNull(property);
-        ArgumentNullException.ThrowIfNull(schema);
+        if (property.Key == null)
+        {
+            throw new ArgumentNullException(nameof(property.Key));
+        }
+
+        if (schema == null)
+        {
+            throw new ArgumentNullException(nameof(schema));
+        }
 
         _property = property.Key;
         var propertyType = property.Key.PropertyType;

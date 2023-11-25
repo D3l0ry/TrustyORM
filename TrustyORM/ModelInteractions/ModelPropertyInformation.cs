@@ -9,8 +9,15 @@ internal class ModelPropertyInformation
 
     public ModelPropertyInformation(PropertyInfo property, DbColumn column)
     {
-        ArgumentNullException.ThrowIfNull(property);
-        ArgumentNullException.ThrowIfNull(column);
+        if (property == null)
+        {
+            throw new ArgumentNullException(nameof(property));
+        }
+
+        if (column == null)
+        {
+            throw new ArgumentNullException(nameof(column));
+        }
 
         _property = property;
         _column = column;
